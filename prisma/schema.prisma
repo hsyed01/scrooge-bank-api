@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("USER")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  account   Account?
+  loans     Loan[]
+  withdrawals Withdrawal[]
+  deposits    Deposit[]
+}
+
+model Account {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  balance   Float    @default(0)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Loan {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Float
+  paid      Float    @default(0)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Withdrawal {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Deposit {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Float
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
